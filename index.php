@@ -20,7 +20,7 @@ mysqli_close($conn);
     <title>Hello, world!</title>
 </head>
 <body>
-    <h1>Welcome to Vagrant</h1>
+    <h1>Hello to Vagrant</h1>
     <?php if(mysqli_num_rows($result) > 0): ?>
         <ul>
             <?php while($row = mysqli_fetch_object($result)): ?>
