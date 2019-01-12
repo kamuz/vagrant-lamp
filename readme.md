@@ -58,7 +58,7 @@ Vagrant.configure("2") do |config|
   # Network Settings
   config.vm.network "private_network", ip: "192.168.33.10"
   # Folder Settings
-  config.vm.synced_folder ".", "/var/www/html"
+  config.vm.synced_folder ".", "/var/www/"
   # Provider Settings
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
@@ -181,3 +181,89 @@ mysqli_close($conn);
 ```
 
 Тестим результат.
+
+Чтобы создать несколько проектов, нужно настроить хосты Apache, но для начала нужно создать файлы и директории:
+
+```bash
+sudo mkdir -p /var/www/wordpress.loc/public_html
+```
+
+Создадим файл:
+
+```bash
+vim /var/www/wordpress.loc/public_html/index.html
+```
+
+Добавим хоть какой то контент:
+
+```html
+<html>
+  <head>
+    <title>Welcome to Example.com!</title>
+  </head>
+  <body>
+    <h1>Success!  The wordpress.loc virtual host is working!</h1>
+  </body>
+</html>
+```
+
+Затем настроить права:
+
+```bash
+sudo chmod -R 755 /var/www
+```
+
+Создадим новый хост:
+
+```bash
+sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/wordpress.loc.conf
+```
+
+И отредактируем таким образом:
+
+```
+<VirtualHost *:80>
+    RewriteEngine On
+    ServerAdmin webmaster@localhost
+    ServerName wordpress.loc
+    ServerAlias www.wordpress.loc
+    DocumentRoot /var/www/wordpress.loc/public_html
+    <Directory /var/www/wordpress.loc/public_html>
+        Options FollowSymLinks
+        AllowOverride All
+    </Directory>
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+Активируем хост и перезагрузим Apache:
+
+```bash
+sudo a2ensite wordpress.loc.conf
+sudo service apache2 restart
+```
+
+Распостранённым прийомом является перезаписывание URL для удоства использования и лучшего индесирования сайта поисковыми системами. Эта фунциональность возможна при использовании модуля `rewrite`.
+
+```bash
+sudo a2enmod rewrite
+```
+
+Для поддержки обслуживания несколький общих папок, нам понадобится еще один известный модуль `vhost_alias`, который обеспечивает динамически сконфигурированный массовый виртуальный хостинг.
+
+```bash
+sudo a2enmod vhost_alias
+```
+
+Наконец, чтобы обеспечить дополнительную анализ того что делает веб-сервер, давайте удостоверимся, что модуль состояния включен.
+
+```bash
+sudo a2enmod status
+```
+
+Перезапустим сервер:
+
+```bash
+sudo service apache2 restart
+```

@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
   # Network Settings
   config.vm.network "private_network", ip: "192.168.33.10"
   # Folder Settings
-  config.vm.synced_folder ".", "/var/www/html"
+  config.vm.synced_folder ".", "/var/www/"
   # Provider Settings
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
